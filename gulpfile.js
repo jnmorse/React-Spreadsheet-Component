@@ -31,21 +31,22 @@ gulp.task('clean-lib', function (cb) {
     });
 });
 
-gulp.task('transpile-js', ['clean-lib'], function () {
+gulp.task('transpile-js', gulp.series('clean-lib', function transpileJS() {
     return gulp.src(jsSrcPaths)
         .pipe(plumber())
         .pipe(react({harmony: false, es6module: true}))
         .pipe(babel())
         .pipe(gulp.dest('./lib'));
-});
+}));
 
-gulp.task('lint-js', ['transpile-js'], function () {
+gulp.task('lint-js', gulp.series('transpile-js', function lintJS() {
     return gulp.src(jsLibPaths)
         .pipe(jshint('./.jshintrc'))
         .pipe(jshint.reporter('jshint-stylish'));
-});
+}));
 
-gulp.task('bundle-js', ['lint-js'], function () {
+
+gulp.task('bundle-js', gulp.series('lint-js', function bundleJS() {
     var b = browserify(pkg.main, {
         debug: !!gutil.env.debug
         , standalone: pkg.standalone
@@ -68,7 +69,7 @@ gulp.task('bundle-js', ['lint-js'], function () {
     }
 
     return stream;
-});
+}));
 
 gulp.task('watch', function () {
     gulp.watch(jsSrcPaths, ['bundle-js']);
@@ -83,12 +84,12 @@ gulp.task('connect', function () {
     gutil.log('--------------------------------------------');
 });
 
-gulp.task('example', ['transpile-js'], function () {
+gulp.task('example', gulp.series('transpile-js', function () {
     return browserify('./example.js')
         .transform("babelify", {presets: ["es2015", "react"]})
         .bundle()
         .pipe(source('bundle.js'))
         .pipe(gulp.dest('./example'));
-});
+}));
 
-gulp.task('default', ['bundle-js', 'connect', 'watch']);
+gulp.task('default', gulp.series('bundle-js', 'connect', 'watch'));
