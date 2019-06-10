@@ -1,11 +1,9 @@
-'use strict'
+import React from 'react'
+import renderer from 'react-test-renderer'
 
-jest.dontMock('../row');
+import RowComponent from '../cell'
 
-import React from 'react';
-import renderer from 'react-test-renderer';
-
-import RowComponent from '../cell';
+jest.dontMock('../row')
 
 const testVars = {
   cells: [],
@@ -14,13 +12,14 @@ const testVars = {
   key: 'testkey',
   spreadsheetId: '0',
   className: 'cellComponent'
-};
+}
 
 describe('Row', () => {
   it('Renders a row', () => {
-    const row = renderer.create(
-      <table>
-        <tbody>
+    const row = renderer
+      .create(
+        <table>
+          <tbody>
             <RowComponent
               cells={testVars.cells}
               cellClasses={testVars.cellClasses}
@@ -29,9 +28,10 @@ describe('Row', () => {
               spreadsheetId={testVars.spreadsheetId}
               className={testVars.className}
             />
-        </tbody>
-      </table> 
-    ).toJSON();
-    expect(row).toMatchSnapshot();
-  });
-});
+          </tbody>
+        </table>
+      )
+      .toJSON()
+    expect(row).toMatchSnapshot()
+  })
+})

@@ -13,6 +13,9 @@ exports[`Cell Renders a cell 1`] = `
           <span
             onClick={[Function]}
             onDoubleClick={[Function]}
+            onKeyDown={[Function]}
+            role="textbox"
+            tabIndex={0}
           >
             test
           </span>

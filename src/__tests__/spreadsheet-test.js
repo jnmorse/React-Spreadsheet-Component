@@ -1,20 +1,18 @@
-'use strict';
+import React from 'react'
+import renderer from 'react-test-renderer'
 
-jest.dontMock('../spreadsheet');
+import SpreadsheetComponent from '../spreadsheet'
 
-import React from 'react';
-import renderer from 'react-test-renderer';
-
-import SpreadsheetComponent from '../spreadsheet';
+jest.dontMock('../spreadsheet')
 
 const testVars = {
   initialData: {
     rows: [
-        ['', '', '', '', '', '', '', ''],
-        ['', 1, 2, 3, 4, 5, 6, 7],
-        ['', 1, '', 3, 4, 5, 6, 7],
-        ['', 1, 2, 3, 4, 5, 6, 7],
-        ['', 1, 2, 3, 4, 5, 6, 7]
+      ['', '', '', '', '', '', '', ''],
+      ['', 1, 2, 3, 4, 5, 6, 7],
+      ['', 1, '', 3, 4, 5, 6, 7],
+      ['', 1, 2, 3, 4, 5, 6, 7],
+      ['', 1, 2, 3, 4, 5, 6, 7]
     ]
   },
   config: {
@@ -29,17 +27,20 @@ const testVars = {
     emptyValueSymbol: '-',
     hasLetterNumberHeads: true
   }
-};
+}
 
 describe('Spreadsheet', () => {
   it('Renders a spreadsheet', () => {
-    let spreadsheet = renderer.create(
-       <SpreadsheetComponent
+    const spreadsheet = renderer
+      .create(
+        <SpreadsheetComponent
           initialData={testVars.initialData}
           config={testVars.config}
           cellClasses={testVars.cellClasses}
-          spreadsheetId="test-id" />
-    ).toJSON();    
-    expect(spreadsheet).toMatchSnapshot;
-  });
-});
+          spreadsheetId="test-id"
+        />
+      )
+      .toJSON()
+    expect(spreadsheet).toMatchSnapshot()
+  })
+})
