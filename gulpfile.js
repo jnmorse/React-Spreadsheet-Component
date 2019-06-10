@@ -1,95 +1,98 @@
-var browserify = require('browserify');
-var del        = require('del');
-var gulp       = require('gulp');
-var source     = require('vinyl-source-stream');
+/* eslint-disable no-multi-str */
+const browserify = require('browserify')
+const del = require('del')
+const gulp = require('gulp')
+const source = require('vinyl-source-stream')
 
-var header     = require('gulp-header');
-var jshint     = require('gulp-jshint');
-var rename     = require('gulp-rename');
-var plumber    = require('gulp-plumber');
-var react      = require('gulp-react');
-var streamify  = require('gulp-streamify');
-var uglify     = require('gulp-uglify');
-var gutil      = require('gulp-util');
-var connect    = require('gulp-connect');
-var babel      = require('gulp-babel');
-var babelify   = require('babelify');
+const header = require('gulp-header')
+const rename = require('gulp-rename')
+const plumber = require('gulp-plumber')
+const streamify = require('gulp-streamify')
+const uglify = require('gulp-uglify')
+const gutil = require('gulp-util')
+const connect = require('gulp-connect')
+const babel = require('gulp-babel')
 
-var pkg = require('./package.json');
-var devBuild = (process.env.NODE_ENV === 'production') ? '' : ' (dev build at ' + (new Date()).toUTCString() + ')';
-var distHeader = '/*!\n\
+const pkg = require('./package.json')
+
+const devBuild =
+  process.env.NODE_ENV === 'production'
+    ? ''
+    : ` (dev build at ${new Date().toUTCString()})`
+const distHeader =
+  '/*!\n\
  * <%= pkg.name %> <%= pkg.version %><%= devBuild %> - <%= pkg.homepage %>\n\
  * <%= pkg.license %> Licensed\n\
- */\n';
+ */\n'
 
-var jsSrcPaths = './src/*.js*'
-var jsLibPaths = './lib/*.js'
+const jsSrcPaths = './src/*.js*'
+const jsLibPaths = './lib/*.js'
 
-gulp.task('clean-lib', function (cb) {
-    del(jsLibPaths).then(function () {
-        cb();
-    });
-});
+gulp.task('clean-lib', function cleanLib(cb) {
+  del(jsLibPaths).then(() => cb())
+})
 
-gulp.task('transpile-js', gulp.series('clean-lib', function transpileJS() {
-    return gulp.src(jsSrcPaths)
-        .pipe(plumber())
-        .pipe(react({harmony: false, es6module: true}))
-        .pipe(babel())
-        .pipe(gulp.dest('./lib'));
-}));
+gulp.task(
+  'transpile-js',
+  gulp.series('clean-lib', function transpileJS() {
+    return gulp
+      .src(jsSrcPaths)
+      .pipe(plumber())
+      .pipe(babel())
+      .pipe(gulp.dest('./lib'))
+  })
+)
 
-gulp.task('lint-js', gulp.series('transpile-js', function lintJS() {
-    return gulp.src(jsLibPaths)
-        .pipe(jshint('./.jshintrc'))
-        .pipe(jshint.reporter('jshint-stylish'));
-}));
+gulp.task('bundle-js', () => {
+  const b = browserify(pkg.main, {
+    debug: !!gutil.env.debug,
+    standalone: pkg.standalone,
+    detectGlobals: false
+  })
 
+  b.transform('browserify-shim')
 
-gulp.task('bundle-js', gulp.series('lint-js', function bundleJS() {
-    var b = browserify(pkg.main, {
-        debug: !!gutil.env.debug
-        , standalone: pkg.standalone
-        , detectGlobals: false
-    });
-    
-    b.transform('browserify-shim')
-    
-    var stream = b.bundle()
-        .pipe(source('spreadsheet.js'))
-        .pipe(streamify(header(distHeader, { pkg: pkg, devBuild: devBuild })))
-        .pipe(gulp.dest('./dist'));
-        
-    if (process.env.NODE_ENV === 'production') {
-        stream = stream
-            .pipe(rename('spreadsheet.min.js'))
-            .pipe(streamify(uglify()))
-            .pipe(streamify(header(distHeader, { pkg: pkg, devBuild: devBuild })))
-            .pipe(gulp.dest('./dist'));
-    }
+  let stream = b
+    .bundle()
+    .pipe(source('spreadsheet.js'))
+    .pipe(streamify(header(distHeader, { pkg, devBuild })))
+    .pipe(gulp.dest('./dist'))
 
-    return stream;
-}));
+  if (process.env.NODE_ENV === 'production') {
+    stream = stream
+      .pipe(rename('spreadsheet.min.js'))
+      .pipe(streamify(uglify()))
+      .pipe(streamify(header(distHeader, { pkg, devBuild })))
+      .pipe(gulp.dest('./dist'))
+  }
 
-gulp.task('watch', function () {
-    gulp.watch(jsSrcPaths, ['bundle-js']);
-});
+  return stream
+})
 
-gulp.task('connect', function () {
-    connect.server();
-    
-    gutil.log('--------------------------------------------')
-    gutil.log(gutil.colors.magenta('To see the example, open up a browser and go'));
-    gutil.log(gutil.colors.bold.red('to http://localhost:8080/example'));
-    gutil.log('--------------------------------------------');
-});
+gulp.task('watch', function watch() {
+  gulp.watch(jsSrcPaths, gulp.series('bundle-js'))
+})
 
-gulp.task('example', gulp.series('transpile-js', function () {
+gulp.task('connect', function connectServer() {
+  connect.server()
+
+  gutil.log('--------------------------------------------')
+  gutil.log(
+    gutil.colors.magenta('To see the example, open up a browser and go')
+  )
+  gutil.log(gutil.colors.bold.red('to http://localhost:8080/example'))
+  gutil.log('--------------------------------------------')
+})
+
+gulp.task(
+  'example',
+  gulp.series('transpile-js', function example() {
     return browserify('./example.js')
-        .transform("babelify", {presets: ["es2015", "react"]})
-        .bundle()
-        .pipe(source('bundle.js'))
-        .pipe(gulp.dest('./example'));
-}));
+      .transform('babelify', { presets: ['es2015', 'react'] })
+      .bundle()
+      .pipe(source('bundle.js'))
+      .pipe(gulp.dest('./example'))
+  })
+)
 
-gulp.task('default', gulp.series('bundle-js', 'connect', 'watch'));
+gulp.task('default', gulp.parallel('bundle-js', 'connect', 'watch'))
