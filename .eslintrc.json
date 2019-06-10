@@ -13,5 +13,21 @@
     },
     "extends": "jnmorse",
     "rules": {
-    }
+        "react/sort-comp": "off",
+        "react/destructuring-assignment": "off"
+    },
+    "overrides": [
+        {
+            "files": [
+                "**/__tests__/**/*.js"
+            ],
+            "env": {
+                "jest": true
+            },
+            "rules": {
+                "import/no-relative-parent-imports": "off",
+                "max-lines-per-function": "off"
+            }
+        }
+    ]
 }
