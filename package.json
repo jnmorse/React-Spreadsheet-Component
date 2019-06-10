@@ -1,22 +1,33 @@
 {
   "name": "react-spreadsheet-component",
-  "description": "A Spreadsheet Component for ReactJS",
   "version": "1.0.2",
-  "license": "MIT",
+  "description": "A Spreadsheet Component for ReactJS",
   "repository": "felixrieseberg/React-Spreadsheet-Component",
-  "maintainers": [
-    {
-      "name": "Felix Rieseberg",
-      "email": "felix@felixrieseberg.com",
-      "web": "http://www.felixrieseberg.com"
-    }
-  ],
+  "license": "MIT",
+  "main": "./lib/spreadsheet.js",
+  "scripts": {
+    "debug": "gulp --debug",
+    "dist": "gulp bundle-js --production --release && gulp bundle-js --development --release",
+    "lint": "eslint .",
+    "test": "jest",
+    "watch": "gulp"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "\\.js*": "<rootDir>/preprocessor.js"
+    },
+    "unmockedModulePathPatterns": [
+      "<rootDir>/node_modules/*"
+    ]
+  },
   "dependencies": {
     "jquery": "^3.4.1",
     "mousetrap": "^1.5.3"
-  },
-  "peerDependencies": {
-    "react": "^16.8.6"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
@@ -54,30 +65,19 @@
     "tape": "^4.2.2",
     "vinyl-source-stream": "^2.0.0"
   },
-  "scripts": {
-    "debug": "gulp --debug",
-    "lint": "eslint .",
-    "dist": "gulp bundle-js --production --release && gulp bundle-js --development --release",
-    "watch": "gulp",
-    "test": "jest"
-  },
-  "jest": {
-    "transform": {
-      "\\.js*": "<rootDir>/preprocessor.js"
-    },
-    "unmockedModulePathPatterns": [
-      "<rootDir>/node_modules/*"
-    ]
+  "peerDependencies": {
+    "react": "^16.8.6"
   },
   "browserify-shim": {
     "react": "global:React",
     "react-dom": "global:ReactDOM"
   },
-  "browserify": {
-    "transform": [
-      "browserify-shim"
-    ]
-  },
-  "main": "./lib/spreadsheet.js",
+  "maintainers": [
+    {
+      "name": "Felix Rieseberg",
+      "email": "felix@felixrieseberg.com",
+      "web": "http://www.felixrieseberg.com"
+    }
+  ],
   "standalone": "React-Spreadsheet"
 }
