@@ -16,7 +16,7 @@
     "mousetrap": "^1.5.3"
   },
   "peerDependencies": {
-    "react": "^15.6.0"
+    "react": "^16.8.6"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
