@@ -56,6 +56,7 @@
   },
   "scripts": {
     "debug": "gulp --debug",
+    "lint": "eslint .",
     "dist": "gulp bundle-js --production --release && gulp bundle-js --development --release",
     "watch": "gulp",
     "test": "jest"
